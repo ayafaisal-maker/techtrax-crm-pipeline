@@ -1,0 +1,146 @@
+collections:
+
+  # ---------- Core CRM entities ----------
+  tenants:
+    load_type: full
+    has_tenant_filter: false   # tenants IS the tenant
+    has_soft_delete: true
+
+  users:
+    load_type: incremental
+    watermark_field: updatedAt
+    has_tenant_filter: true
+    has_soft_delete: true
+
+  roles:
+    load_type: full
+    has_tenant_filter: true
+    has_soft_delete: true
+
+  teams:
+    load_type: full
+    has_tenant_filter: true
+    has_soft_delete: true
+
+  customerprofiles:
+    load_type: incremental
+    watermark_field: updatedAt
+    has_tenant_filter: true
+    has_soft_delete: true
+
+  customfields:
+    load_type: full
+    has_tenant_filter: true
+    has_soft_delete: true
+
+  fileassets:
+    load_type: incremental
+    watermark_field: updatedAt
+    has_tenant_filter: true
+    has_soft_delete: true
+
+  notifications:
+    load_type: incremental
+    watermark_field: updatedAt
+    has_tenant_filter: true
+    has_soft_delete: true
+
+  # ---------- Audit / history (append-only, no soft delete) ----------
+  auditlogs:
+    load_type: incremental
+    watermark_field: timestamp
+    has_tenant_filter: true
+    has_soft_delete: false
+    note: "Large collection (~186K docs). Watch load time."
+
+  permissionauditlogs:
+    load_type: incremental
+    watermark_field: timestamp
+    has_tenant_filter: true
+    has_soft_delete: false
+
+  crmauditlogs:
+    load_type: incremental
+    watermark_field: timestamp
+    has_tenant_filter: true
+    has_soft_delete: false
+
+  leadhistories:
+    load_type: incremental
+    watermark_field: createdAt
+    has_tenant_filter: true
+    has_soft_delete: false
+
+  # ---------- Pipeline / funnel ----------
+  stages:
+    load_type: full
+    has_tenant_filter: true
+    has_soft_delete: true
+
+  leadnotes:
+    load_type: incremental
+    watermark_field: updatedAt
+    has_tenant_filter: true
+    has_soft_delete: false   # uses isArchived instead
+
+  # ---------- CRM config / lookups ----------
+  crmconfigs:
+    load_type: full
+    has_tenant_filter: true
+    has_soft_delete: false
+
+  crmreferencedatas:
+    load_type: full
+    has_tenant_filter: true
+    has_soft_delete: true
+
+  # ---------- HR / Shifts ----------
+  crmshifts:
+    load_type: full
+    has_tenant_filter: true
+    has_soft_delete: true
+
+  crmshifttemplates:
+    load_type: full
+    has_tenant_filter: true
+    has_soft_delete: true
+
+  crmrequestshiftchanges:
+    load_type: incremental
+    watermark_field: updatedAt
+    has_tenant_filter: true
+    has_soft_delete: true
+
+  crmclockrecords:
+    load_type: incremental
+    watermark_field: updatedAt
+    has_tenant_filter: true
+    has_soft_delete: true
+
+  crmleaves:
+    load_type: incremental
+    watermark_field: updatedAt
+    has_tenant_filter: true
+    has_soft_delete: true
+
+  crmleavetypes:
+    load_type: full
+    has_tenant_filter: true
+    has_soft_delete: true
+
+  crmuserleavebalances:
+    load_type: full
+    has_tenant_filter: true
+    has_soft_delete: true
+
+  # ---------- Google Sheets integration ----------
+  googlesheetsconfigs:
+    load_type: full
+    has_tenant_filter: true
+    has_soft_delete: true
+
+  googlesheetssynclogs:
+    load_type: incremental
+    watermark_field: syncStartedAt
+    has_tenant_filter: true
+    has_soft_delete: false

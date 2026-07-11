@@ -1,0 +1,7 @@
+pymongo
+pandas
+python-dotenv
+pyyaml
+ijson
+google-cloud-storage
+google-cloud-bigquery

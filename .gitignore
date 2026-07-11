@@ -1,0 +1,9 @@
+.env
+gcp-keys/
+certs/
+output/
+output_ndjson/
+__pycache__/
+*.pyc
+.venv/
+.venv-1/
