@@ -10,10 +10,7 @@ load_dotenv()
 BUCKET_NAME = "techtrax-crm-pipeline"
 OUTPUT_DIR = os.path.join("..", "output_ndjson")
 
-import glob as glob_module
-ONLY_THESE_FILES = [
-    os.path.basename(f) for f in glob_module.glob(os.path.join(OUTPUT_DIR, "auditlogs*.json"))
-] + ["customerprofiles.json"]
+ONLY_THESE_FILES = []
 
 
 def upload_file_with_retry(bucket, filepath, blob_path, max_retries=5):

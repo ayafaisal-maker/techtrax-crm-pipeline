@@ -11,6 +11,8 @@ print("Script started")
 CONFIG_PATH = os.path.join("..", "config", "collections.yaml")
 OUTPUT_DIR = os.path.join("..", "output")
 
+EXCLUDED_COLLECTIONS = ["auditlogs"]
+
 
 def load_config():
     print("Loading config...")
@@ -21,14 +23,11 @@ def load_config():
 
 
 def build_query(collection_config):
-    query = {}
-    if collection_config.get("has_soft_delete"):
-        query["isSoftDeleted"] = {"$ne": True}
-    return query
+    # مفيش فلتر خالص - نجيب كل الصفوف بما فيهم soft-deleted
+    return {}
 
 
 def json_default(obj):
-   
     if isinstance(obj, datetime):
         return obj.isoformat()
     return str(obj)
@@ -85,6 +84,9 @@ def main():
 
     results = {}
     for name, cfg in config.items():
+        if name in EXCLUDED_COLLECTIONS:
+            print(f"\nSkipping excluded collection: {name}")
+            continue
         docs = extract_collection(db, name, cfg)
         save_to_json(name, docs)
         results[name] = docs
@@ -98,4 +100,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    main() 

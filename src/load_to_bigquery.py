@@ -31,7 +31,7 @@ def load_all_to_bigquery():
     filenames = []
     for f in json_files:
         basename = os.path.basename(f)
-        if basename in ("auditlogs.json", "googlesheetssynclogs.json"):
+        if basename == "auditlogs.json":
             continue
         if is_file_empty(f):
             skipped_empty.append(basename)
