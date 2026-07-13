@@ -1,0 +1,28 @@
+version: 2
+
+sources:
+  - name: techtrax_raw
+    project: data-analysis-450711
+    dataset: techtrax_raw
+    tables:
+      - name: tenants
+      - name: users
+      - name: roles
+      - name: teams
+      - name: customerprofiles
+      - name: customfields
+      - name: fileassets
+      - name: notifications
+      - name: stages
+      - name: leadhistories
+      - name: leadnotes
+      - name: crmconfigs
+      - name: crmreferencedatas
+      - name: crmauditlogs
+      - name: crmshifts
+      - name: crmshifttemplates
+      - name: crmclockrecords
+      - name: permissionauditlogs
+      - name: googlesheetsconfigs
+      - name: googlesheetssynclogs
+      - name: auditlogs
