@@ -12,15 +12,30 @@ FIELDS_TO_STRINGIFY = {
     "customerprofiles.json": ["customFields"],
 }
 
+# حقول لازم تتحول لـ نص دايمًا (بغض النظر عن نوعها الأصلي)
+# عشان تتجنب تعارض النوع في BigQuery (زي phone بترجع string أحيانًا و int أحيانًا)
+FIELDS_TO_FORCE_STRING = {
+    "googlesheetssynclogs.json": ["phone"],
+}
+
 
 def get_base_name(filename):
     return re.sub(r'_part\d+\.json$', '.json', filename)
 
 
 def stringify_fields(record, fields):
+    """بتحول قيمة الحقل كامل (object/array) لنص JSON واحد"""
     for field in fields:
         if field in record and record[field] is not None:
             record[field] = json.dumps(record[field], ensure_ascii=False)
+    return record
+
+
+def force_string_fields(record, fields):
+    """بتحول قيمة الحقل (رقم، bool، إلخ) لنص عادي بسيط، مش JSON مغلف"""
+    for field in fields:
+        if field in record and record[field] is not None:
+            record[field] = str(record[field])
     return record
 
 
@@ -28,6 +43,7 @@ def convert_file(filepath):
     filename = os.path.basename(filepath)
     base_name = get_base_name(filename)
     fields_to_fix = FIELDS_TO_STRINGIFY.get(base_name, [])
+    fields_to_force_string = FIELDS_TO_FORCE_STRING.get(base_name, [])
 
     out_path = os.path.join(NDJSON_DIR, filename)
 
@@ -38,10 +54,18 @@ def convert_file(filepath):
         for record in data:
             if fields_to_fix:
                 record = stringify_fields(record, fields_to_fix)
+            if fields_to_force_string:
+                record = force_string_fields(record, fields_to_force_string)
             out.write(json.dumps(record, ensure_ascii=False) + "\n")
 
-    print(f"  Converted: {filename} ({len(data)} records)" +
-          (f" [stringified: {fields_to_fix}]" if fields_to_fix else ""))
+    notes = []
+    if fields_to_fix:
+        notes.append(f"stringified: {fields_to_fix}")
+    if fields_to_force_string:
+        notes.append(f"forced string: {fields_to_force_string}")
+    note_str = f" [{', '.join(notes)}]" if notes else ""
+
+    print(f"  Converted: {filename} ({len(data)} records){note_str}")
 
 
 def main():

@@ -43,7 +43,7 @@ def load_all_to_bigquery():
     filenames = []
     for f in json_files:
         basename = os.path.basename(f)
-        if basename == "auditlogs.json":
+        if basename == "auditlogs.json" or basename.startswith("_"):
             continue
         if is_file_empty(f):
             skipped_empty.append(basename)
@@ -73,13 +73,28 @@ def load_all_to_bigquery():
 
         print(f"Loading table: {table_name} ({len(files)} file(s)) — mode: {mode} ({write_disposition})")
 
-        job_config = bigquery.LoadJobConfig(
+        job_config_kwargs = dict(
             source_format=bigquery.SourceFormat.NEWLINE_DELIMITED_JSON,
-            autodetect=True,
             write_disposition=write_disposition,
             ignore_unknown_values=True,
             max_bad_records=1000,
         )
+
+        # في حالة الـ INCREMENTAL، ناخد الـ schema من الجدول الموجود فعليًا
+        # بدل ما نسيب autodetect يخمن من عينة صغيرة وممكن يختلف عن الجدول الأصلي
+        if mode == "INCREMENTAL":
+            try:
+                existing_table = client.get_table(table_id)
+                job_config_kwargs["schema"] = existing_table.schema
+                job_config_kwargs["autodetect"] = False
+                print(f"  Using existing table schema ({len(existing_table.schema)} fields)")
+            except Exception:
+                print(f"  Table doesn't exist yet, falling back to autodetect")
+                job_config_kwargs["autodetect"] = True
+        else:
+            job_config_kwargs["autodetect"] = True
+
+        job_config = bigquery.LoadJobConfig(**job_config_kwargs)
 
         try:
             load_job = client.load_table_from_uri(
