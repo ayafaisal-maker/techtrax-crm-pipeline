@@ -14,7 +14,6 @@ FIELDS_TO_STRINGIFY = {
 
 
 def get_base_name(filename):
-   
     return re.sub(r'_part\d+\.json$', '.json', filename)
 
 
@@ -47,7 +46,10 @@ def convert_file(filepath):
 
 def main():
     os.makedirs(NDJSON_DIR, exist_ok=True)
-    json_files = glob.glob(os.path.join(OUTPUT_DIR, "*.json"))
+    json_files = [
+        f for f in glob.glob(os.path.join(OUTPUT_DIR, "*.json"))
+        if not os.path.basename(f).startswith("_")
+    ]
 
     print(f"Converting {len(json_files)} files to NDJSON format...\n")
     for filepath in json_files:

@@ -1,4 +1,5 @@
 import os
+import json
 import glob
 import re
 from dotenv import load_dotenv
@@ -10,6 +11,7 @@ PROJECT_ID = os.getenv("GCP_PROJECT_ID")
 DATASET_ID = "techtrax_raw"
 BUCKET_NAME = "techtrax-crm-pipeline"
 OUTPUT_DIR = os.path.join("..", "output_ndjson")
+LOAD_MODES_PATH = os.path.join("..", "output", "_load_modes.json")
 
 
 def get_table_name(filename):
@@ -22,8 +24,18 @@ def is_file_empty(filepath):
     return os.path.getsize(filepath) <= 1
 
 
+def load_modes_map():
+    """بيقرا نوع التحميل (FULL/INCREMENTAL) اللي extract.py سجله لكل collection"""
+    if not os.path.exists(LOAD_MODES_PATH):
+        print("  Warning: no _load_modes.json found, defaulting all to FULL (truncate)")
+        return {}
+    with open(LOAD_MODES_PATH, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
 def load_all_to_bigquery():
     client = bigquery.Client(project=PROJECT_ID)
+    modes = load_modes_map()
 
     json_files = glob.glob(os.path.join(OUTPUT_DIR, "*.json"))
 
@@ -52,12 +64,19 @@ def load_all_to_bigquery():
         table_id = f"{PROJECT_ID}.{DATASET_ID}.{table_name}"
         uris = [f"gs://{BUCKET_NAME}/raw_ndjson/{fname}" for fname in files]
 
-        print(f"Loading table: {table_name} ({len(files)} file(s))")
+        mode = modes.get(table_name, "FULL")
+        write_disposition = (
+            bigquery.WriteDisposition.WRITE_APPEND
+            if mode == "INCREMENTAL"
+            else bigquery.WriteDisposition.WRITE_TRUNCATE
+        )
+
+        print(f"Loading table: {table_name} ({len(files)} file(s)) — mode: {mode} ({write_disposition})")
 
         job_config = bigquery.LoadJobConfig(
             source_format=bigquery.SourceFormat.NEWLINE_DELIMITED_JSON,
             autodetect=True,
-            write_disposition=bigquery.WriteDisposition.WRITE_TRUNCATE,
+            write_disposition=write_disposition,
             ignore_unknown_values=True,
             max_bad_records=1000,
         )
@@ -69,7 +88,7 @@ def load_all_to_bigquery():
             load_job.result()
 
             table = client.get_table(table_id)
-            print(f"  Loaded {table.num_rows} rows into {table_id}\n")
+            print(f"  Loaded {table.num_rows} total rows now in {table_id}\n")
         except Exception as e:
             print(f"  Failed to load {table_name}: {e}\n")
 

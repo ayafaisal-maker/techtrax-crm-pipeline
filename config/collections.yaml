@@ -144,3 +144,5 @@ collections:
     watermark_field: syncStartedAt
     has_tenant_filter: true
     has_soft_delete: false
+   
+    
