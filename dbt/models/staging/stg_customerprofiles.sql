@@ -6,7 +6,32 @@ select
     email,
     phone,
     isSoftDeleted as is_soft_deleted,
+
+    crm.stageId as stage_id,
+    crm.previousStageId as previous_stage_id,
+    crm.status as deal_status,
+    crm.assignedTo as assigned_to,
+    crm.assignedBy as assigned_by,
+    crm.assignedAt as assigned_at,
+    crm.priority as priority,
+    crm.followUpCount as follow_up_count,
+    crm.enteredPipelineAt as entered_pipeline_at,
+    crm.stageEnteredAt as stage_entered_at,
+    crm.firstContactAt as first_contact_at,
+    crm.lastContactAt as last_contact_at,
+    crm.lastActivityAt as last_activity_at,
+    crm.dealWonAt as deal_won_at,
+    crm.dealLostAt as deal_lost_at,
+    crm.bookingDate as booking_date,
+    crm.snoozedAt as snoozed_at,
+    crm.snoozeDate as snooze_date,
+    crm.snoozedBy as snoozed_by,
+
+    modules.crm.isActive as crm_module_active,
+    modules.crm.activatedAt as crm_activated_at,
+    modules.cms.isActive as cms_module_active,
+
     createdAt as created_at,
     updatedAt as updated_at,
-    PARSE_JSON(customFields) as custom_fields
+    customFields as custom_fields
 from {{ source('techtrax_raw', 'customerprofiles') }}

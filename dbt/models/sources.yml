@@ -1,5 +1,4 @@
 version: 2
-
 sources:
   - name: techtrax_raw
     project: data-analysis-450711
@@ -22,6 +21,7 @@ sources:
       - name: crmshifts
       - name: crmshifttemplates
       - name: crmclockrecords
+      - name: crmleavetypes
       - name: permissionauditlogs
       - name: googlesheetsconfigs
       - name: googlesheetssynclogs
