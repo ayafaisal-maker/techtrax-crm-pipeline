@@ -1,14 +1,13 @@
 name: 'techtrax_crm'
 version: '1.0.0'
 config-version: 2
-
 profile: 'techtrax_crm'
-
 model-paths: ["models"]
-
 models:
   techtrax_crm:
     staging:
       +materialized: view
+      +schema: techtrax_staging
     marts:
       +materialized: table
+      +schema: techtrax_marts

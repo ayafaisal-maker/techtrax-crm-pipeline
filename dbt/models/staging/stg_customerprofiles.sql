@@ -6,7 +6,6 @@ select
     email,
     phone,
     isSoftDeleted as is_soft_deleted,
-
     crm.stageId as stage_id,
     crm.previousStageId as previous_stage_id,
     crm.status as deal_status,
@@ -26,12 +25,11 @@ select
     crm.snoozedAt as snoozed_at,
     crm.snoozeDate as snooze_date,
     crm.snoozedBy as snoozed_by,
-
     modules.crm.isActive as crm_module_active,
     modules.crm.activatedAt as crm_activated_at,
     modules.cms.isActive as cms_module_active,
-
     createdAt as created_at,
     updatedAt as updated_at,
     customFields as custom_fields
 from {{ source('techtrax_raw', 'customerprofiles') }}
+qualify row_number() over (partition by _id order by updatedAt desc) = 1

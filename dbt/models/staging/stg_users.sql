@@ -16,3 +16,4 @@ select
     createdAt as created_at,
     updatedAt as updated_at
 from {{ source('techtrax_raw', 'users') }}
+qualify row_number() over (partition by _id order by updatedAt desc) = 1
