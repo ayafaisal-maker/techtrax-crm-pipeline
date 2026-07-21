@@ -10,6 +10,7 @@ NDJSON_DIR = os.path.join("..", "output_ndjson")
 FIELDS_TO_STRINGIFY = {
     "auditlogs.json": ["requestBody", "responseBody"],
     "customerprofiles.json": ["customFields"],
+    "patients.json": ["familyHistory", "EHR", "Lifestyle", "chronicConditions", "contraindications", "dosesHistory"],
 }
 
 # حقول لازم تتحول لـ نص دايمًا (بغض النظر عن نوعها الأصلي)
@@ -38,6 +39,13 @@ def force_string_fields(record, fields):
             record[field] = str(record[field])
     return record
 
+def clean_null_from_arrays(record):
+    """بتشيل أي null موجود جوه أي array، عشان BigQuery مبيقبلش null كعنصر في REPEATED field"""
+    for key, value in record.items():
+        if isinstance(value, list):
+            record[key] = [item for item in value if item is not None]
+    return record
+
 
 def convert_file(filepath):
     filename = os.path.basename(filepath)
@@ -56,6 +64,7 @@ def convert_file(filepath):
                 record = stringify_fields(record, fields_to_fix)
             if fields_to_force_string:
                 record = force_string_fields(record, fields_to_force_string)
+            record = clean_null_from_arrays(record)
             out.write(json.dumps(record, ensure_ascii=False) + "\n")
 
     notes = []

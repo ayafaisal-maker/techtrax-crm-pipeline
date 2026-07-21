@@ -145,4 +145,19 @@ collections:
     has_tenant_filter: true
     has_soft_delete: false
    
-    
+      # ---------- Billing / Revenue ----------
+  payments:
+    load_type: incremental
+    watermark_field: updatedAt
+    has_tenant_filter: true
+    has_soft_delete: true
+  patients:
+    load_type: incremental
+    watermark_field: updatedAt
+    has_tenant_filter: true
+    has_soft_delete: true
+  appointments:
+    load_type: incremental
+    watermark_field: updatedAt
+    has_tenant_filter: true
+    has_soft_delete: true

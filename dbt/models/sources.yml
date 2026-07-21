@@ -26,3 +26,6 @@ sources:
       - name: googlesheetsconfigs
       - name: googlesheetssynclogs
       - name: auditlogs
+      - name: payments
+      - name: patients
+      - name: appointments
